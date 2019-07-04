@@ -1,0 +1,954 @@
+
+CREATE TABLE generated_sort_chems (
+highest_sort_chems TEXT NOT NULL
+);
+
+CREATE TABLE projects (
+project_id TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX project_index ON projects (project_id);
+
+CREATE TABLE watersheds (
+watershed_id VARCHAR(20) NOT NULL,
+watershed_characteristics VARCHAR(20) NOT NULL
+);
+CREATE UNIQUE INDEX watershed_id_index ON watersheds (watershed_id);
+
+CREATE TABLE sites (
+site_id TEXT NOT NULL,
+sites_batch_id INT NOT NULL,
+project_id TEXT,
+latitude INT,
+longitude INT,
+body_of_water TEXT,
+watershed_id INT,
+area INT,
+slope INT,
+elevation INT,
+burn_proportion INT,
+
+FOREIGN KEY (watershed_id) REFERENCES watersheds(watershed_id)
+ON DELETE CASCADE
+);
+CREATE UNIQUE INDEX site_id_index ON sites (site_id);
+
+CREATE TABLE sites_batches (
+sites_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+datetime_uploaded DATETIME NOT NULL
+);
+
+CREATE TABLE site_codes (
+site_id TEXT NOT NULL PRIMARY KEY,
+alternate_name TEXT NOT NULL
+);
+
+
+CREATE TABLE sort_chems (
+site_id TEXT,
+project_id TEXT,
+date_sampled DATE,
+time_sampled TIME,
+sort_chem TEXT NOT NULL,
+ph INT,
+orp INT,
+o2_percent INT,
+o2_mg INT,
+conductance INT,
+temperature INT,
+pressure INT,
+calibrated TEXT,
+q_salt_grams INT,
+q_time TIME,
+q_date DATE,
+notes TEXT,
+conditions TEXT,
+samplers TEXT,
+volume_filtered INT,
+aqualog_yes INT,
+doc_isotopes_yes INT,
+elementar_yes INT,
+scan_yes INT,
+ic_yes INT,
+icp_yes INT,
+lachat_yes INT,
+no3_isotopes_yes INT,
+srp_yes INT,
+water_isotopes_yes INT,
+ignore_yes INT,
+
+datetime_uploaded DATETIME,
+file_path TEXT,
+
+FOREIGN KEY (site_id) REFERENCES sites (site_id) ON DELETE CASCADE
+
+);
+
+CREATE INDEX sort_chem_index ON sort_chems (sort_chem);
+
+CREATE TABLE sort_chems_to_ic_anion_batches (
+sort_chem TEXT NOT NULL,
+ic_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (ic_batch_id) REFERENCES ic_batches (ic_batch_id) ON DELETE CASCADE
+);
+
+
+CREATE INDEX sort_chem_to_ic_anion_batches_index ON sort_chems_to_ic_anion_batches (sort_chem);
+
+CREATE TABLE sort_chems_to_ic_cation_batches (
+sort_chem TEXT NOT NULL,
+ic_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (ic_batch_id) REFERENCES ic_batches (ic_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chem_to_ic_cation_batches_index ON sort_chems_to_ic_cation_batches (sort_chem);
+
+
+CREATE TABLE sort_chems_to_icp_batches (
+sort_chem TEXT NOT NULL,
+icp_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (icp_batch_id) REFERENCES icp_batches (icp_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chem_to_icp_batches_index ON sort_chems_to_icp_batches (sort_chem);
+
+
+CREATE TABLE scan_datetimes_to_scan_fp_batches (
+datetime_run DATETIME NOT NULL,
+scan_fp_batch_id INT NOT NULL,
+
+FOREIGN KEY (datetime_run) REFERENCES sort_chem_to_scan_datetime (datetime_run) ON DELETE CASCADE,
+FOREIGN KEY (scan_fp_batch_id) REFERENCES scan_fp_batches
+);
+
+CREATE INDEX scan_datetimes_to_scan_fp_batches_index ON scan_datetimes_to_scan_fp_batches (datetime_run);
+
+CREATE TABLE scan_datetimes_to_scan_par_batches (
+datetime_run DATETIME NOT NULL,
+scan_par_batch_id INT NOT NULL,
+
+FOREIGN KEY (datetime_run) REFERENCES sort_chem_to_scan_datetime (datetime_run) ON DELETE CASCADE,
+FOREIGN KEY (scan_par_batch_id) REFERENCES scan_par_batches
+);
+
+CREATE INDEX scan_datetimes_to_scan_par_batches_index ON scan_datetimes_to_scan_par_batches (datetime_run);
+
+
+CREATE TABLE sort_chems_to_elementar_batches (
+sort_chem TEXT NOT NULL,
+elementar_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (elementar_batch_id) REFERENCES elementar_batches (elementar_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chems_to_elementar_batches_index ON sort_chems_to_elementar_batches (sort_chem);
+
+
+CREATE TABLE sort_chems_to_aqualog_batches (
+    sort_chem TEXT NOT NULL,
+    aqualog_batch_id INT NOT NULL,
+    FOREIGN KEY (sort_chem)
+        REFERENCES sort_chems (sort_chem)
+        ON DELETE CASCADE,
+    FOREIGN KEY (aqualog_batch_id)
+        REFERENCES aqualog_batches (aqualog_batch_id)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chems_to_aqualog_batches_index ON sort_chems_to_aqualog_batches (sort_chem);
+
+CREATE TABLE sort_chems_to_doc_isotope_batches (
+sort_chem TEXT NOT NULL,
+doc_isotope_batch_id INT NOT NULL,
+
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (doc_isotope_batch_id) REFERENCES doc_isotope_batches (doc_isotope_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chems_to_doc_isotope_batches_index ON sort_chems_to_doc_isotope_batches (sort_chem);
+
+
+CREATE TABLE sort_chems_to_lachat_batches (
+sort_chem TEXT NOT NULL,
+lachat_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (lachat_batch_id) REFERENCES lachat_batches (lachat_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chems_to_lachat_batches_index ON sort_chems_to_lachat_batches (sort_chem);
+
+
+CREATE TABLE sort_chems_to_no3_batches (
+sort_chem TEXT NOT NULL,
+no3_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (no3_batch_id) REFERENCES no3_batches (no3_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chems_to_no3_batches_index ON sort_chems_to_no3_batches (sort_chem);
+
+CREATE TABLE sort_chems_to_srp_batches (
+sort_chem TEXT NOT NULL,
+srp_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (srp_batch_id) REFERENCES srp_batches (srp_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chems_to_srp_batches_index ON sort_chems_to_srp_batches (sort_chem);
+
+
+CREATE TABLE sort_chems_to_water_isotopes_batches (
+sort_chem TEXT NOT NULL,
+water_isotopes_batch_id INT NOT NULL,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (water_isotopes_batch_id) REFERENCES water_isotopes_batches (water_isotopes_batch_id) ON DELETE CASCADE
+);
+
+CREATE INDEX sort_chems_to_water_isotopes_batches_index ON sort_chems_to_water_isotopes_batches (sort_chem);
+
+
+CREATE TABLE hannas (
+hanna_serial_num INT NOT NULL PRIMARY KEY,
+instrument_name VARCHAR(20) NOT NULL,
+instrument_id VARCHAR(20),
+meter_software_version VARCHAR(20) NOT NULL,
+meter_software_date DATE NOT NULL,
+
+UNIQUE (hanna_serial_num, meter_software_version, meter_software_date)
+
+);
+
+
+CREATE UNIQUE INDEX hannas_index ON hannas (hanna_serial_num);
+
+CREATE TABLE hanna_batches (
+hanna_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+reference_temperature INT NOT NULL,
+temperature_coefficient DECIMAL NOT NULL,
+tds_factor DECIMAL NOT NULL,
+lot_name VARCHAR(20) NOT NULL,
+remarks VARCHAR(30),
+start_date DATE NOT NULL,
+start_time TIME NOT NULL,
+samples_no INT NOT NULL,
+logging_interval TIME,
+num_parameters INT NOT NULL,
+pc_software_version VARCHAR(20) NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+
+project_id VARCHAR(20) NOT NULL,
+hanna_serial_num INT NOT NULL,
+site_id VARCHAR(20) NOT NULL,
+
+FOREIGN KEY (project_id) REFERENCES projects(project_id)
+	ON DELETE CASCADE,
+
+FOREIGN KEY (hanna_serial_num) REFERENCES hannas(hanna_serial_num)
+	ON DELETE CASCADE
+
+FOREIGN KEY (site_id) REFERENCES sites(site_id)
+	ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX hanna_batch_id_index ON hanna_batches (hanna_batch_id);
+
+
+CREATE TABLE hanna_logs (
+hanna_log_key INTEGER PRIMARY KEY AUTOINCREMENT,
+logging_date DATE NOT NULL,
+logging_time DATE NOT NULL,
+temperature INT NOT NULL,
+pH INT NOT NULL,
+orp_mv INT NOT NULL,
+ec INT NOT NULL,
+pressure INT NOT NULL,
+do_percent INT NOT NULL,
+do_concentration INT NOT NULL,
+remarks TEXT,
+hanna_batch INTEGER NOT NULL,
+
+FOREIGN KEY (hanna_batch) REFERENCES hanna_batches(hanna_batch)
+	ON DELETE CASCADE
+
+);
+
+CREATE TABLE eurekas (
+eureka_name TEXT NOT NULL,
+eureka_make TEXT NOT NULL,
+eureka_serial_num INT NOT NULL PRIMARY KEY,
+UNIQUE (eureka_name, eureka_make, eureka_serial_num)
+);
+
+CREATE UNIQUE INDEX eureka_serial_num_index ON eurekas (eureka_serial_num);
+
+
+
+CREATE TABLE eureka_batches (
+eureka_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+eureka_serial_num INT NULL,
+site_id TEXT NOT NULL,
+date_extracted DATE,
+project_id TEXT NOT NULL,
+first_logging_date DATE NOT NULL,
+first_logging_time TIME NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+
+FOREIGN KEY (eureka_serial_num) REFERENCES eurekas (eureka_serial_num)
+	ON DELETE CASCADE,
+FOREIGN KEY (site_id) REFERENCES sites (site_id) ON DELETE CASCADE,
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX eureka_batch_id ON eureka_batches (eureka_batch_id);
+
+CREATE TABLE eureka_logs (
+logging_date DATE NOT NULL,
+logging_time TIME NOT NULL,
+temp INT NOT NULL,
+ph_units INT NOT NULL,
+orp INT NOT NULL,
+sp_cond INT NOT NULL,
+turbidity INT NOT NULL,
+hdo_perc_sat INT NOT NULL,
+hdo_concentration INT NOT NULL,
+ph_mv INT NOT NULL,
+int_batt_v INT NOT NULL,
+eureka_batch_id INT NOT NULL,
+
+FOREIGN KEY (eureka_batch_id) REFERENCES eurekas (eureka_batch_id)
+	ON DELETE CASCADE
+
+);
+
+CREATE TABLE hobos (
+hobo_serial_num INT NOT NULL PRIMARY KEY,
+UNIQUE (hobo_serial_num)
+);
+
+CREATE UNIQUE INDEX hobo_serial_num_index ON hobos (hobo_serial_num);
+
+CREATE TABLE hobo_batches (
+site_id TEXT NOT NULL,
+project_id TEXT NOT NULL,
+hobo_serial_num INT NOT NULL,
+first_logged_date DATE NOT NULL,
+first_logged_time TIME NOT NULL,
+date_extracted DATE,
+batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+
+FOREIGN KEY (site_id) REFERENCES sites (site_id) ON DELETE CASCADE,
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
+FOREIGN KEY (hobo_serial_num) REFERENCES hobos (hobo_serial_num) ON DELETE CASCADE
+
+);
+
+CREATE UNIQUE INDEX batch_id_index ON hobo_batches (batch_id);
+
+CREATE TABLE hobo_logs (
+logging_date DATE NOT NULL,
+logging_time TIME NOT NULL,
+absolute_pressure INT NOT NULL,
+temperature_celsius INT NOT NULL,
+batch_id TEXT NOT NULL,
+
+FOREIGN KEY (batch_id) REFERENCES hobo_batches (batch_id) ON DELETE CASCADE
+
+);
+
+
+CREATE TABLE ic_anion_reads (
+batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+
+fluoride INT,
+acetate INT,
+formate INT,
+chloride INT,
+nitrite INT,
+bromide INT,
+nitrate INT,
+sulfate INT,
+phosphate INT,
+
+FOREIGN KEY (batch_id) REFERENCES ic_batches (ic_batch_id) ON DELETE CASCADE,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE
+);
+
+CREATE TABLE ic_cation_reads (
+batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+
+lithium INT,
+sodium INT,
+ammonium INT,
+potassium INT,
+magnesium INT,
+calcium INT,
+strontium INT,
+
+FOREIGN KEY (batch_id) REFERENCES ic_batches (ic_batch_id) ON DELETE CASCADE,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE
+);
+
+CREATE TABLE ic_batches (
+ic_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+date_run DATE NOT NULL,
+project_id TEXT NOT NULL,
+operator TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX ic_batch_id_index ON ic_batches (ic_batch_id);
+
+
+
+CREATE TABLE icp_batches (
+icp_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+date_run DATE NOT NULL,
+project_id TEXT NOT NULL,
+operator TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX icp_batch_id_index ON icp_batches (icp_batch_id);
+
+CREATE TABLE icp_reads (
+icp_batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+
+aluminum INT,
+arsenic INT,
+boron INT,
+barium INT,
+calcium INT,
+cadmium INT,
+cobalt INT,
+chromium INT,
+copper INT,
+iron INT,
+potassium INT,
+magnesium INT,
+manganese INT,
+molybdenum INT,
+sodium iNT,
+nickel INT,
+phosphorus INT,
+lead INT,
+sulfur INT,
+selenium INT,
+silicon INT,
+strontium INT,
+titanium INT,
+vanadium INT,
+zinc INT,
+
+FOREIGN KEY (icp_batch_id) REFERENCES icp_batches (icp_batch_id) ON DELETE CASCADE,
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE
+
+);
+
+CREATE TABLE scan_instrument_to_location_and_time (
+scan_instrument_id TEXT NOT NULL,
+site_id TEXT NOT NULL,
+start_date DATE NOT NULL,
+end_date DATE NOT NULL
+);
+
+CREATE TABLE scan_par_batches (
+scan_par_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+scan_instrument_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+project_id TEXT NOT NULL,
+
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
+FOREIGN KEY (scan_instrument_id) REFERENCES scan_instrument_to_location_and_time (scan_instrument_id) ON DELETE CASCADE
+);
+
+CREATE TABLE scan_par_reads (
+scan_par_batch_id INT NOT NULL,
+datetime_run DATETIME NOT NULL,
+turbidity INT,
+no3 INT,
+toc INT,
+doc INT,
+
+FOREIGN KEY (scan_par_batch_id) REFERENCES scan_par_batches (scan_par_batch_id) ON DELETE CASCADE,
+FOREIGN KEY (datetime_run) REFERENCES sort_chem_to_scan_datetime (datetime_run) ON DELETE CASCADE
+);
+
+
+
+
+CREATE TABLE scan_fp_reads (
+datetime_run DATETIME NOT NULL,
+scan_fp_batch_id INT NOT NULL,
+
+nm200 INT,
+nm202 INT,
+nm205 INT,
+nm207 INT,
+nm210 INT,
+nm212 INT,
+nm215 INT,
+nm217 INT,
+nm220 INT,
+nm222 INT,
+nm225 INT,
+nm227 INT,
+nm230 INT,
+nm232 INT,
+nm235 INT,
+nm237 INT,
+nm240 INT,
+nm242 INT,
+nm245 INT,
+nm247 INT,
+nm250 INT,
+nm252 INT,
+nm255 INT,
+nm257 INT,
+nm260 INT,
+nm262 INT,
+nm265 INT,
+nm267 INT,
+nm270 INT,
+nm272 INT,
+nm275 INT,
+nm277 INT,
+nm280 INT,
+nm282 INT,
+nm285 INT,
+nm287 INT,
+nm290 INT,
+nm292 INT,
+nm295 INT,
+nm297 INT,
+nm300 INT,
+nm302 INT,
+nm305 INT,
+nm307 INT,
+nm310 INT,
+nm312 INT,
+nm315 INT,
+nm317 INT,
+nm320 INT,
+nm322 INT,
+nm325 INT,
+nm327 INT,
+nm330 INT,
+nm332 INT,
+nm335 INT,
+nm337 INT,
+nm340 INT,
+nm342 INT,
+nm345 INT,
+nm347 INT,
+nm350 INT,
+nm352 INT,
+nm355 INT,
+nm357 INT,
+nm360 INT,
+nm362 INT,
+nm365 INT,
+nm367 INT,
+nm370 INT,
+nm372 INT,
+nm375 INT,
+nm377 INT,
+nm380 INT,
+nm382 INT,
+nm385 INT,
+nm387 INT,
+nm390 INT,
+nm392 INT,
+nm395 INT,
+nm397 INT,
+nm400 INT,
+nm402 INT,
+nm405 INT,
+nm407 INT,
+nm410 INT,
+nm412 INT,
+nm415 INT,
+nm417 INT,
+nm420 INT,
+nm422 INT,
+nm425 INT,
+nm427 INT,
+nm430 INT,
+nm432 INT,
+nm435 INT,
+nm437 INT,
+nm440 INT,
+nm442 INT,
+nm445 INT,
+nm447 INT,
+nm450 INT,
+nm457 INT,
+nm460 INT,
+nm462 INT,
+nm465 INT,
+nm467 INT,
+nm470 INT,
+nm472 INT,
+nm475 INT,
+nm477 INT,
+nm480 INT,
+nm482 INT,
+nm485 INT,
+nm487 INT,
+nm490 INT,
+nm492 INT,
+nm495 INT,
+nm497 INT,
+nm500 INT,
+nm502 INT,
+nm505 INT,
+nm507 INT,
+nm510 INT,
+nm512 INT,
+nm515 INT,
+nm517 INT,
+nm520 INT,
+nm522 INT,
+nm525 INT,
+nm527 INT,
+nm530 INT,
+nm532 INT,
+nm535 INT,
+nm537 INT,
+nm540 INT,
+nm542 INT,
+nm545 INT,
+nm547 INT,
+nm550 INT,
+nm552 INT,
+nm555 INT,
+nm557 INT,
+nm560 INT,
+nm562 INT,
+nm565 INT,
+nm567 INT,
+nm570 INT,
+nm572 INT,
+nm575 INT,
+nm577 INT,
+nm580 INT,
+nm582 INT,
+nm585 INT,
+nm587 INT,
+nm590 INT,
+nm592 INT,
+nm595 INT,
+nm597 INT,
+nm600 INT,
+nm602 INT,
+nm605 INT,
+nm607 INT,
+nm610 INT,
+nm612 INT,
+nm615 INT,
+nm617 INT,
+nm620 INT,
+nm622 INT,
+nm625 INT,
+nm627 INT,
+nm630 INT,
+nm632 INT,
+nm635 INT,
+nm637 INT,
+nm640 INT,
+nm642 INT,
+nm645 INT,
+nm647 INT,
+nm650 INT,
+nm652 INT,
+nm655 INT,
+nm657 INT,
+nm660 INT,
+nm662 INT,
+nm665 INT,
+nm667 INT,
+nm670 INT,
+nm672 INT,
+nm675 INT,
+nm677 INT,
+nm680 INT,
+nm682 INT,
+nm685 INT,
+nm687 INT,
+nm690 INT,
+nm692 INT,
+nm695 INT,
+nm697 INT,
+nm700 INT,
+nm702 INT,
+nm705 INT,
+nm707 INT,
+nm710 INT,
+nm712 INT,
+nm715 INT,
+nm717 INT,
+nm720 INT,
+nm722 INT,
+nm725 INT,
+nm727 INT,
+nm730 INT,
+nm732 INT,
+nm735 INT,
+nm737 INT,
+nm740 INT,
+nm742 INT,
+nm745 INT,
+nm747 INT,
+nm750 INT,
+
+
+UNIQUE (datetime_run),
+FOREIGN KEY (scan_fp_batch_id) REFERENCES scan_fp_batches (scan_fp_batch_id) ON DELETE CASCADE,
+FOREIGN KEY (datetime_run) REFERENCES sort_chem_to_scan_datetime (datetime_run) ON DELETE CASCADE
+
+);
+
+CREATE TABLE scan_fp_batches (
+scan_fp_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+scan_instrument_id TEXT NOT NULL,
+
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
+FOREIGN KEY (scan_instrument_id) REFERENCES scan_instrument_to_location_and_time (scan_instrument_id) ON DELETE CASCADE
+);
+
+CREATE TABLE scan_master_batches (
+scan_master_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+upload_datetime DATETIME NOT NULL
+);
+
+CREATE TABLE sort_chems_to_datetime_run (
+sort_chem TEXT NOT NULL,
+datetime_run DATETIME NOT NULL,
+scan_master_batch_id INTEGER NOT NULL,
+
+FOREIGN KEY (sort_chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE,
+FOREIGN KEY (scan_master_batch_id) REFERENCES scan_master_batches (scan_master_batch_id) ON DELETE CASCADE,
+UNIQUE (sort_chem, datetime_run)
+);
+
+
+CREATE TABLE elementar_batches (
+elementar_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+date_run DATE NOT NULL,
+project_id TEXT NOT NULL,
+operator TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE elementar_reads (
+elementar_batch_id INT NOT NULL,
+
+hole INT NOT NULL,
+sort_chem TEXT NOT NULL,
+method TEXT NOT NULL,
+
+tic_area INT,
+tc_area INT,
+npoc_area INT,
+tnb_area INT,
+
+tic_mg_per_liter INT,
+tc_mg_per_liter INT,
+npoc_mg_per_liter INT,
+tnb_mg_per_liter INT,
+
+date_run INT,
+time_run INT,
+
+FOREIGN KEY (elementar_batch_id) REFERENCES elementar_batches (elementar_batch_id) ON DELETE CASCADE,
+FOREIGN KEY (sort_Chem) REFERENCES sort_chems (sort_chem) ON DELETE CASCADE
+);
+
+CREATE TABLE aqualog_batches (
+aqualog_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+datetime_uploaded DATETIME NOT NULL,
+file_name TEXT NOT NULL
+);
+
+CREATE TABLE aqualog_reads (
+aqualog_batch_id INTEGER NOT NULL,
+sort_chem TEXT NOT NULL,
+
+operator TEXT,
+corrected_by TEXT,
+date_collected TEXT,
+date_corrected TEXT,
+project_file TEXT,
+sample_name TEXT,
+corrected_name TEXT,
+blank_name TEXT,
+dilution_factor INT,
+fi370 INT NOT NULL,
+fi310 INT NOT NULL,
+fi254 INT NOT NULL,
+abs254 INT NOT NULL,
+slp274_295 INT NOT NULL,
+slp350_400 INT NOT NULL,
+sr INT NOT NULL,
+ese3 INT NOT NULL,
+
+FOREIGN KEY (aqualog_batch_id) REFERENCES aqualog_Batches (aqualog_batch_id) ON DELETE CASCADE
+);
+
+CREATE TABLE doc_isotope_batches (
+doc_isotope_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+datetime_uploaded DATETIME NOT NULL,
+
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+CREATE TABLE doc_isotope_reads (
+doc_isotope_batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+internal_identifier TEXT,
+doc_ppm INT NOT NULL,
+delta_13_c INT NOT NULL,
+comments TEXT,
+
+FOREIGN KEY (doc_isotope_batch_id) REFERENCES doc_isotope_batches (doc_isotope_batch_id) ON DELETE CASCADE
+);
+
+CREATE TABLE lachat_batches (
+lachat_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+datetime_uploaded DATETIME NOT NULL,
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+
+);
+
+CREATE TABLE lachat_reads(
+lachat_batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+no3_ppm INT NOT NULL,
+no4_ppm INT NOT NULL,
+FOREIGN KEY (lachat_batch_id) REFERENCES lachat_batches (lachat_batch_id) ON DELETE CASCADE
+);
+
+CREATE TABLE no3_batches (
+no3_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+datetime_uploaded DATETIME NOT NULL,
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+CREATE TABLE no3_reads(
+no3_batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+d15n_air INT NOT NULL,
+d18_ovsmow INT NOT NULL,
+comments TEXT,
+FOREIGN KEY (no3_batch_id) REFERENCES no3_batches (no3_batch_id) ON DELETE CASCADE
+);
+
+CREATE TABLE srp_batches (
+srp_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+datetime_uploaded DATETIME NOT NULL,
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE srp_reads (
+srp_batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+analysis_date date,
+absorbance INT NOT NULL,
+concentration INT NOT NULL,
+
+std_1_concentration INT,
+std_2_concentration INT,
+std_3_concentration INT,
+std_4_concentration INT,
+std_5_concentration INT,
+std_6_concentration INT,
+
+std_1_absorbance INT,
+std_2_absorbance INT,
+std_3_absorbance INT,
+std_4_absorbance INT,
+std_5_absorbance INT,
+std_6_absorbance,
+
+FOREIGN KEY (srp_batch_id) REFERENCES srp_batches (srp_batch_id) ON DELETE CASCADE
+);
+
+CREATE TABLE water_isotopes_batches (
+water_isotopes_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+datetime_uploaded DATETIME NOT NULL,
+FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE
+);
+
+CREATE TABLE water_isotopes_reads (
+water_isotopes_batch_id INT NOT NULL,
+sort_chem TEXT NOT NULL,
+datetime_run DATETIME,
+d18o INT NOT NULL,
+d18o_error INT,
+dd INT NOT NULL,
+dd_error INT,
+
+FOREIGN KEY (water_isotopes_batch_id) REFERENCES water_isotopes_batches (water_isotopes_batch_id) ON DELETE CASCADE
+
+);
+
+CREATE TABLE q_batches (
+q_batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+file_path TEXT NOT NULL,
+datetime_uploaded DATETIME NOT NULL
+);
+
+CREATE TABLE q_reads (
+q_batch_id INT NOT NULL,
+site_id TEXT NOT NULL,
+date_sampled DATE NOT NULL,
+time_sampled TIME NOT NULL,
+discharge INT NOT NULL,
+FOREIGN KEY (q_batch_id) REFERENCES q_batches (q_batch_id) ON DELETE CASCADE
+);

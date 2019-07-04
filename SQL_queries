@@ -1,0 +1,34 @@
+
+/* join two tables. . . */
+SELECT sort_chems.sort_chem, aluminum, arsenic, boron
+FROM sort_chems, icp_reads
+WHERE sort_chems.sort_chem = icp_reads.sort_chem;
+
+/* get sort chems of a particular date */
+SELECT (sort_chem) FROM sort_chems WHERE date_sampled = ();
+
+/* combine the two */
+SELECT sort_chems.sort_chem, aluminum, arsenic, boron
+FROM sort_chems, icp_reads
+WHERE (SELECT (sort_chems.sort_chem) FROM sort_chems WHERE sort_chems.date_sampled = (2018-04-02)) = icp_reads.sort_chem;
+
+
+/* get the max batch id (the most recent one) for a given sort-chem*/
+(SELECT sort_chem, MAX(icp_batch_id)
+FROM sort_chems_to_icp_batches
+GROUP BY sort_chem);
+
+/* get the columns associated with the largest batch id for a sort-chem on a given date*/
+SELECT sort_chems.sort_chem, aluminum, arsenic, boron
+FROM sort_chems, icp_reads
+WHERE (SELECT (sort_chems.sort_chem) FROM sort_chems WHERE sort_chems.date_sampled = (2018-04-02)) = icp_reads.sort_chem
+AND icp_reads.icp_batch_id = (SELECT sort_chem, MAX(icp_batch_id) FROM sort_chems_to_icp_batches GROUP BY sort_chem);
+
+
+INSERT INTO projects (project_id) VALUES ("MegaFire");
+INSERT INTO projects (project_id) VALUES ("Baseline");
+INSERT INTO projects (project_id) VALUES ("CitizenScience");
+INSERT INTO projects (project_id) VALUES ("AlaskaBurn");
+INSERT INTO projects (project_id) VALUES ("AlaskaSynoptic");
+INSERT INTO projects (project_id) VALUES ("Aanderud");
+INSERT INTO projects (project_id) VALUES ("otherLabs");
